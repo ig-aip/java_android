@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_home" android:icon="@drawable/ic_menu_today" android:title="Home" />
+    <item android:id="@+id/nav_search" android:icon="@drawable/ic_menu_search" android:title="Search" />
+    <item android:id="@+id/nav_liked" android:icon="@drawable/ic_liked" android:title="Liked" />
+    <item android:id="@+id/nav_upload" android:icon="@drawable/ic_menu_upload" android:title="Upload" />
+    <item android:id="@+id/nav_profile" android:icon="@drawable/ic_menu_myplaces" android:title="Profile" />
+</menu>
