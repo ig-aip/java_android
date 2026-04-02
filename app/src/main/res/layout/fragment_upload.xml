@@ -35,6 +35,7 @@
             app:tint="#A0A0A0" />
 
         <TextView
+            android:id="@+id/tvDropZoneLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

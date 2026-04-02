@@ -5,6 +5,8 @@ public class MusicFile {
     String user_uuid;
     String s3_path;
     String title;
+
+    String artist;
     boolean is_public;
 
     public MusicFile() {
@@ -56,5 +58,13 @@ public class MusicFile {
 
     public void setIs_public(boolean is_public) {
         this.is_public = is_public;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 }

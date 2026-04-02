@@ -1,4 +1,4 @@
-package com.example.mp3_client_java.network;
+package com.example.mp3_client_java.network.response;
 
 public class DownloadResponse {
     private String download_link;

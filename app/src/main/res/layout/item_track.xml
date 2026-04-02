@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:paddingVertical="12dp"
-    android:paddingHorizontal="8dp">
+    android:paddingHorizontal="8dp"
+    android:id="@+id/item_track">
+
 
     <TextView
         android:id="@+id/tv_track_number"

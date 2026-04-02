@@ -27,6 +27,7 @@ public class NetworkApi {
 
 
     static  ObjectMapper mapper = new ObjectMapper();
+
     Context context;
     TokenManager tokenManager;
 //    public NetworkApi(Context context_){
@@ -35,7 +36,7 @@ public class NetworkApi {
 //    }
 
 
-    private OkHttpClient getUnsafeOkHttpClient()
+    private static OkHttpClient getUnsafeOkHttpClient()
     {
         try {
             TrustManager[] trustAllCerts = new TrustManager[]{
@@ -69,7 +70,8 @@ public class NetworkApi {
     }
 
     public static NetworkApi getSINGLTON(){
-        if(SINGLTON == null){ SINGLTON = new NetworkApi();
+        if(SINGLTON == null){ SINGLTON = new NetworkApi(); }
+        return SINGLTON;
     }
 
     private NetworkApi(){
@@ -85,6 +87,12 @@ public class NetworkApi {
 
 
     }
+
+
+    public MusicApiService getApi(){
+        return retrofit.create(MusicApiService.class);
+    }
+
 
 //    public CompletableFuture<Boolean> refreshTokenAsync(){
 //        return CompletableFuture.supplyAsync(() -> {

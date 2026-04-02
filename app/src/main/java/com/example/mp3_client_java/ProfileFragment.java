@@ -25,7 +25,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NotNull View view, @NotNull Bundle savedInstanceState){
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
         TabLayout tableLayout = view.findViewById(R.id.profileTabLayout);
@@ -37,8 +37,16 @@ public class ProfileFragment extends Fragment {
             @NonNull
             @Override
             public Fragment createFragment(int position) {
-                //Тут можно поменять 0_-
-                return new Fragment();
+                switch (position) {
+                    case 0:
+                        return new HomeFragment(); // All music
+                    case 1:
+                        return new UploadedTracksFragment(); // Тот самый новый фрагмент!
+                    case 2:
+                        return new LikedFragment(); // Понравившиеся
+                    default:
+                        return new HomeFragment();
+                }
             }
 
             @Override

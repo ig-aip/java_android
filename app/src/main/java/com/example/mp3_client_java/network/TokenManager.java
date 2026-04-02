@@ -15,7 +15,7 @@ public class TokenManager {
     }
 
     public void saveTokens(String access, String refresh){
-        prefs.edit().putString(KEY_ACCESS, access).putString(KEY_REFRESH, refresh);
+        prefs.edit().putString(KEY_ACCESS, access).putString(KEY_REFRESH, refresh).apply();
     }
 
     public String getAccessToken() { return prefs.getString(KEY_ACCESS, null); }
