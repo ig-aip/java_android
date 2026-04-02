@@ -193,7 +193,7 @@ public class UploadFragment extends Fragment {
                 RequestBody requestBody = RequestBody.create(null, fileBytes);
                 Request request = new Request.Builder()
                         .url(uploadUrl)
-                        .header("Host", "127.0.0.1:9000") // Обманываем MinIO, чтобы прошла проверка подписи
+                        .header("Connection", "close")
                         .put(requestBody)
                         .build();
 
