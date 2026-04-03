@@ -27,6 +27,7 @@ import com.example.mp3_client_java.network.TokenManager;
 import com.example.mp3_client_java.network.response.UploadLinkResponse;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import retrofit2.Call;
 import retrofit2.Callback;
 
@@ -172,28 +176,43 @@ public class UploadFragment extends Fragment {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                // ПРОВЕРКА КОНТЕКСТА: предотвращает краши, если фрагмент закрыли
+                // Предотвращает краши, если фрагмент закрыли
                 if (!isAdded() || getContext() == null) return;
 
-                InputStream inputStream = getContext().getContentResolver().openInputStream(selectedAudioUri);
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                int nRead;
-                byte[] data = new byte[16384];
-                while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
-                }
-                buffer.flush();
+                // Получаем точный размер файла для S3 (чтобы избежать chunked transfer)
+                long fileSize = getFileSize(selectedAudioUri);
 
-                byte[] fileBytes = buffer.toByteArray();
-                inputStream.close();
-                buffer.close();
+                // Создаем потоковый RequestBody
+                RequestBody requestBody = new RequestBody() {
+
+                    @Nullable
+                    @Override
+                    public MediaType contentType() {
+                        return null;
+                    }
+
+                    @Override
+                    public long contentLength() {
+                        return fileSize;
+                    }
+
+                    @Override
+                    public void writeTo(@NonNull BufferedSink sink) throws IOException {
+                        // Открываем поток и с помощью Okio напрямую пишем его в сетевой сокет!
+                        try (InputStream inputStream = requireContext().getContentResolver().openInputStream(selectedAudioUri);
+                             Source source = Okio.source(inputStream)) {
+
+                            // writeAll читает файл кусками (по умолчанию 8kb) и сразу отправляет на сервер
+                            sink.writeAll(source);
+                        }
+                    }
+                };
 
                 OkHttpClient client = new OkHttpClient();
-                // ИСПРАВЛЕНИЕ MINIO: передаем null вместо MediaType, чтобы избежать добавления не подписанного заголовка Content-Type
-                RequestBody requestBody = RequestBody.create(null, fileBytes);
+
                 Request request = new Request.Builder()
                         .url(uploadUrl)
-                        .header("Connection", "close")
+                        .header("Connection", "close") // Предотвращает ошибку "unexpected end of stream"
                         .put(requestBody)
                         .build();
 
@@ -263,4 +282,22 @@ public class UploadFragment extends Fragment {
             }
         });
     }
+
+
+    private long getFileSize(Uri uri) {
+        long size = -1;
+        try (Cursor cursor = requireContext().getContentResolver().query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (sizeIndex != -1) {
+                    size = cursor.getLong(sizeIndex);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return size;
+    }
+
+
 }

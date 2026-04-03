@@ -108,7 +108,9 @@ public class HomeFragment extends Fragment {
                     String minioUrl = response.body().getDownload_link();
                     // Меняем 127.0.0.1 на 10.0.2.2 для эмулятора Android
                     minioUrl = minioUrl.replace("127.0.0.1", "10.0.2.2");
-                    startAudioPlayer(minioUrl);
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).playGlobalTrack(minioUrl, track);
+                    }
                 }else if (response.code() == 401 || response.code() == 403) {
                     refreshTokensAndRetry();
                 }

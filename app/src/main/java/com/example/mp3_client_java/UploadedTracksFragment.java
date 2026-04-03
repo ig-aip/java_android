@@ -93,7 +93,9 @@ public class UploadedTracksFragment extends Fragment {
             public void onResponse(Call<DownloadResponse> call, Response<DownloadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     String url = response.body().getDownload_link().replace("127.0.0.1", "10.0.2.2");
-                    startAudioPlayer(url);
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).playGlobalTrack(url, track);
+                    }
                 }else if (response.code() == 401 || response.code() == 403) {
                     refreshTokensAndRetry(track);
                 }
