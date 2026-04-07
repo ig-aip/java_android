@@ -8,6 +8,7 @@ public class MusicFile {
 
     String artist;
     boolean is_public;
+    boolean is_liked;
 
     public MusicFile() {
     }
@@ -66,5 +67,13 @@ public class MusicFile {
 
     public void setArtist(String artist) {
         this.artist = artist;
+    }
+
+    public boolean isIs_liked() {
+        return is_liked;
+    }
+
+    public void setIs_liked(boolean is_liked) {
+        this.is_liked = is_liked;
     }
 }

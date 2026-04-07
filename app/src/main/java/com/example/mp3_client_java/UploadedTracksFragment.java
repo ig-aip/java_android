@@ -96,6 +96,7 @@ public class UploadedTracksFragment extends Fragment {
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).playGlobalTrack(url, track);
                     }
+
                 }else if (response.code() == 401 || response.code() == 403) {
                     refreshTokensAndRetry(track);
                 }

@@ -39,4 +39,8 @@ public interface MusicApiService {
     Call<JwtPair> register(@Body Map<String, String> body);
     @POST("https://" + Net_settings.auth_ip + ":" + Net_settings.auth_port + "/api/refresh")
     Call<JwtPair> refreshToken(@Body Map<String, String> body);
+
+
+    @POST("/music/my/listen")
+    Call<Map<String, Boolean>> recordListen(@Body Map<String, String> body);
 }

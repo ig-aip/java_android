@@ -40,14 +40,38 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isLiked = false; // Локальный стейт для лайка
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+
+    private boolean isListenRecorded = false;
+    private int listenTimeMs = 0;
+    private long lastPlayTime = 0;
+
     private final Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                 int currentPos = mediaPlayer.getCurrentPosition();
                 playerSeekBar.setProgress(currentPos);
-                tvCurrentTime.setText(formatTime(currentPos)); // ОБНОВЛЯЕМ ТАЙМЕР
+                tvCurrentTime.setText(formatTime(currentPos));
+
+                // --- НОВАЯ ЛОГИКА ПРОСЛУШИВАНИЙ ---
+                if (!isListenRecorded) {
+                    long now = System.currentTimeMillis();
+                    if (lastPlayTime > 0) {
+                        listenTimeMs += (now - lastPlayTime);
+                    }
+                    lastPlayTime = now;
+
+                    // Если прослушали больше 30 секунд (30000 мс)
+                    if (listenTimeMs >= 30000) {
+                        recordListen(currentTrack.getId());
+                    }
+                }
+                // ------------------------------------
+
                 handler.postDelayed(this, 500);
+            } else {
+                lastPlayTime = 0; // Сбрасываем время отсчета на паузе
             }
         }
     };
@@ -107,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
         //  заглушка
         btnLike.setOnClickListener(v -> {
             if (currentTrack == null) return;
+
             isLiked = !isLiked;
             btnLike.setImageResource(isLiked ? R.drawable.ic_liked_filled : R.drawable.ic_liked);
 
@@ -122,15 +147,20 @@ public class MainActivity extends AppCompatActivity {
             call.enqueue(new Callback<Map<String, Boolean>>() {
                 @Override
                 public void onResponse(Call<Map<String, Boolean>> call, Response<Map<String, Boolean>> response) {
-                    if (!response.isSuccessful()) {
-                        isLiked = !isLiked; // откатываем визуально в случае ошибки на бекенде
+                    if (response.isSuccessful()) {
+                        // Если запрос успешен, сохраняем новый статус в текущий трек
+                        currentTrack.setIs_liked(isLiked);
+                    } else {
+                        // Откат в случае ошибки сервера
+                        isLiked = !isLiked;
                         btnLike.setImageResource(isLiked ? R.drawable.ic_liked_filled : R.drawable.ic_liked);
                         Toast.makeText(MainActivity.this, "Ошибка сервера при оценке", Toast.LENGTH_SHORT).show();
                     }
                 }
                 @Override
                 public void onFailure(Call<Map<String, Boolean>> call, Throwable t) {
-                    isLiked = !isLiked; // откатываем
+                    // Откат в случае ошибки сети
+                    isLiked = !isLiked;
                     btnLike.setImageResource(isLiked ? R.drawable.ic_liked_filled : R.drawable.ic_liked);
                     Toast.makeText(MainActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
                 }
@@ -159,6 +189,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void playGlobalTrack(String url, MusicFile music) {
         try {
+            this.currentTrack = music;
+
+            isListenRecorded = false;
+            listenTimeMs = 0;
+            lastPlayTime = 0;
+
             if (mediaPlayer != null) {
                 mediaPlayer.release();
                 handler.removeCallbacks(updateSeekBar);
@@ -185,8 +221,8 @@ public class MainActivity extends AppCompatActivity {
 
             tvTrackTitle.setText(cleanTitle);
             tvTrackArtist.setText(music.getArtist() != null ? music.getArtist() : "Unknown Artist");
-            isLiked = false; // Сбрасываем визуал лайка при новом треке
-            btnLike.setImageResource(R.drawable.ic_liked);
+            isLiked =  music.isIs_liked();
+            btnLike.setImageResource(isLiked ? R.drawable.ic_liked_filled : R.drawable.ic_liked);
 
             mediaPlayer.setDataSource(url);
             mediaPlayer.prepareAsync();
@@ -212,8 +248,15 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.setOnCompletionListener(mp -> {
                 btnPlayPause.setImageResource(android.R.drawable.ic_media_play);
                 playerSeekBar.setProgress(0);
-                tvCurrentTime.setText("0:00"); // ОБНУЛЯЕМ ТАЙМЕР
+                tvCurrentTime.setText("0:00");
                 handler.removeCallbacks(updateSeekBar);
+                lastPlayTime = 0;
+
+
+                // Засчитываем прослушивание, если трек закончился, а 30 сек не набралось
+                if (!isListenRecorded && currentTrack != null) {
+                    recordListen(currentTrack.getId());
+                }
             });
 
         } catch (Exception e) {
@@ -254,6 +297,28 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
             return true;
+        });
+    }
+
+
+
+    private void recordListen(String musicId) {
+        isListenRecorded = true; // Сразу ставим флаг, чтобы не дублировать запросы
+
+        TokenManager tm = new TokenManager(this);
+        Map<String, String> body = new HashMap<>();
+        body.put("access_token", tm.getAccessToken());
+        body.put("music_id", musicId);
+
+        NetworkApi.getSINGLTON().getApi().recordListen(body).enqueue(new Callback<Map<String, Boolean>>() {
+            @Override
+            public void onResponse(Call<Map<String, Boolean>> call, Response<Map<String, Boolean>> response) {
+                // Сервер успешно засчитал прослушивание (можно вывести Toast для отладки)
+            }
+            @Override
+            public void onFailure(Call<Map<String, Boolean>> call, Throwable t) {
+                // Ошибка сети. При необходимости можно сбросить флаг, чтобы попробовать снова
+            }
         });
     }
 }
