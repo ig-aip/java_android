@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,10 +39,19 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.TrackViewHol
     @Override
     public void onBindViewHolder(@NonNull TrackViewHolder holder, int position) {
         MusicFile track = musicList.get(position);
-
         holder.tvNumber.setText(String.valueOf(position + 1));
         holder.tvTitle.setText(track.getTitle());
-        holder.tvArtist.setText(track.getArtist() != null ? track.getArtist() : "Unknown Artist");
+        holder.tvArtist.setText(track.getUsername() != null ? track.getUsername() : "Unknown Artist");
+
+        // Отображение статуса лайка
+        if (track.isIs_liked()) {
+            holder.likeButton.setImageResource(R.drawable.ic_liked_filled);
+        } else {
+            holder.likeButton.setImageResource(R.drawable.ic_liked);
+        }
+
+        // Скрываем фейковую длительность (или можно оставить "--:--")
+        holder.tvDuration.setVisibility(View.GONE);
 
         holder.itemView.setOnClickListener(v -> clickListener.onTrackClick(track));
     }

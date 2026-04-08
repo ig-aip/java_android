@@ -17,7 +17,6 @@ import com.example.mp3_client_java.music.MusicFile;
 import com.example.mp3_client_java.network.JwtPair;
 import com.example.mp3_client_java.network.NetworkApi;
 import com.example.mp3_client_java.network.TokenManager;
-import com.example.mp3_client_java.network.response.DownloadResponse;
 import com.example.mp3_client_java.network.response.MusicListResponse;
 
 import java.util.HashMap;
@@ -59,10 +58,16 @@ public class LikedFragment extends Fragment {
             public void onResponse(Call<MusicListResponse> call, Response<MusicListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<MusicFile> tracks = response.body().getMusic_list();
-                    TrackAdapter adapter = new TrackAdapter(tracks, track -> playTrack(track));
+                    // ПЕРЕДАЕМ ВЕСЬ ПЛЕЙЛИСТ В ПЛЕЕР
+                    TrackAdapter adapter = new TrackAdapter(tracks, track -> {
+                        if (getActivity() instanceof MainActivity) {
+                            int index = tracks.indexOf(track);
+                            ((MainActivity) getActivity()).playTrackList(tracks, index);
+                        }
+                    });
                     rvLikedTracks.setAdapter(adapter);
                 } else if (response.code() == 401 || response.code() == 403) {
-                    refreshTokensAndRetry(null);
+                    refreshTokensAndRetry();
                 }
             }
 
@@ -75,35 +80,7 @@ public class LikedFragment extends Fragment {
         });
     }
 
-    private void playTrack(MusicFile track) {
-        TokenManager tManager = new TokenManager(requireContext());
-        Map<String, String> body = new HashMap<>();
-        body.put("access_token", tManager.getAccessToken());
-        body.put("s3_path", track.getS3_path());
-
-        NetworkApi.getSINGLTON().getApi().getDownloadLink(body).enqueue(new Callback<DownloadResponse>() {
-            @Override
-            public void onResponse(Call<DownloadResponse> call, Response<DownloadResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    String url = response.body().getDownload_link().replace("127.0.0.1", "10.0.2.2");
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).playGlobalTrack(url, track);
-                    }
-                } else if (response.code() == 401 || response.code() == 403) {
-                    refreshTokensAndRetry(track);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DownloadResponse> call, Throwable t) {
-                if (isAdded() && getContext() != null) {
-                    Toast.makeText(requireContext(), "Ошибка: playTrack", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void refreshTokensAndRetry(MusicFile track) {
+    private void refreshTokensAndRetry() {
         TokenManager tManager = new TokenManager(requireContext());
         String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -116,12 +93,7 @@ public class LikedFragment extends Fragment {
             public void onResponse(Call<JwtPair> call, Response<JwtPair> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getAccess_token() != null) {
                     tManager.saveTokens(response.body().getAccess_token(), response.body().getRefresh_token());
-
-                    if (track == null) {
-                        loadLikedTracks();
-                    } else {
-                        playTrack(track);
-                    }
+                    loadLikedTracks();
                 } else {
                     tManager.clear();
                     startActivity(new Intent(requireContext(), LoginActivity.class));

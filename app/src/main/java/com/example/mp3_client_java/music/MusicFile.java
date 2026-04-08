@@ -6,7 +6,7 @@ public class MusicFile {
     String s3_path;
     String title;
 
-    String artist;
+    String username;
     boolean is_public;
     boolean is_liked;
 
@@ -61,12 +61,12 @@ public class MusicFile {
         this.is_public = is_public;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getUsername() {
+        return username;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public boolean isIs_liked() {

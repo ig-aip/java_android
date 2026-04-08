@@ -39,6 +39,9 @@ public class LoginActivity extends AppCompatActivity {
 
             if (email.isEmpty() || pass.isEmpty()) return;
 
+            // Блокируем кнопку от повторных нажатий
+            btnLogin.setEnabled(false);
+
             String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
             String deviceName = android.os.Build.MODEL;
 
@@ -51,17 +54,24 @@ public class LoginActivity extends AppCompatActivity {
             NetworkApi.getSINGLTON().getApi().logIn(body).enqueue(new Callback<JwtPair>() {
                 @Override
                 public void onResponse(Call<JwtPair> call, Response<JwtPair> response) {
+                    btnLogin.setEnabled(true);
                     if (response.isSuccessful() && response.body() != null) {
                         TokenManager tm = new TokenManager(LoginActivity.this);
                         tm.saveTokens(response.body().getAccess_token(), response.body().getRefresh_token());
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        // Очищаем стек (чтобы нельзя было вернуться назад)
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                         finish();
                     } else {
+                        btnLogin.setEnabled(true);
                         Toast.makeText(LoginActivity.this, "Ошибка логина", Toast.LENGTH_SHORT).show();
                     }
                 }
                 @Override
                 public void onFailure(Call<JwtPair> call, Throwable t) {
+                    btnLogin.setEnabled(true);
                     Toast.makeText(LoginActivity.this, "Ошибка сети login", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -71,6 +81,5 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
             finish();
         });
-
     }
 }

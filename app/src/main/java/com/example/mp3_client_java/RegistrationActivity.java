@@ -44,6 +44,8 @@ public class RegistrationActivity extends AppCompatActivity {
 
         // Отправка данных на регистрацию
         btnSignUp.setOnClickListener(v -> {
+            btnSignUp.setEnabled(false);
+
             String username = etUsername.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String pass = etPassword.getText().toString().trim();
@@ -71,14 +73,20 @@ public class RegistrationActivity extends AppCompatActivity {
                         tm.saveTokens(response.body().getAccess_token(), response.body().getRefresh_token());
 
                         startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
+                        Intent intent = new Intent(RegistrationActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                         finish();
+
                     } else {
-                            Toast.makeText(RegistrationActivity.this, "Ошибка регистрации", Toast.LENGTH_SHORT).show();
+                        btnSignUp.setEnabled(true);
+                        Toast.makeText(RegistrationActivity.this, "Ошибка регистрации", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JwtPair> call, Throwable t) {
+                    btnSignUp.setEnabled(true);
                     Toast.makeText(RegistrationActivity.this, "Ошибка сети regestartion", Toast.LENGTH_SHORT).show();
                 }
             });

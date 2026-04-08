@@ -4,6 +4,7 @@ package com.example.mp3_client_java.network;
 import com.example.mp3_client_java.network.response.DownloadResponse;
 import com.example.mp3_client_java.network.response.MusicListResponse;
 import com.example.mp3_client_java.network.response.UploadLinkResponse;
+import com.example.mp3_client_java.network.response.UserListResponse;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public interface MusicApiService {
 
     @POST("/music/my")
     Call<MusicListResponse> getMyMusic(@Body Map<String, String> body);
-    @POST("/music/my")
+    @POST("/music/popular")
     Call<MusicListResponse> getPopularMusic(@Body Map<String, String> body);
     @POST("/music/my/download")
     Call<DownloadResponse> getDownloadLink(@Body Map<String, String> body);
@@ -43,4 +44,10 @@ public interface MusicApiService {
 
     @POST("/music/my/listen")
     Call<Map<String, Boolean>> recordListen(@Body Map<String, String> body);
+
+    @POST("/music/search")
+    Call<MusicListResponse> searchMusic(@Body Map<String, String> body);
+
+    @POST("https://" + Net_settings.auth_ip + ":" + Net_settings.auth_port + "/api/search/users")
+    Call<UserListResponse> searchUsers(@Body Map<String, String> body);
 }

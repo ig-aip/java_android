@@ -29,15 +29,28 @@
         app:layout_constraintStart_toEndOf="@id/ivProfileAvatar"
         app:layout_constraintTop_toTopOf="@id/ivProfileAvatar" />
 
+    <!-- Кнопка перехода в настройки (шестеренка) -->
+    <ImageView
+        android:id="@+id/btnSettings"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_settings"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
+
     <TextView
         android:id="@+id/tvProfileBio"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
         android:text="Electronic music producer and sound designer. Creating atmospheric soundscapes since 2015."
         android:textColor="#A0A0A0"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnSettings"
         app:layout_constraintStart_toStartOf="@id/tvProfileName"
         app:layout_constraintTop_toBottomOf="@id/tvProfileName" />
 
@@ -68,10 +81,7 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-
-
     <!-- Tabs Container -->
-    <!-- Контейнер для вкладок с ползунком -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/profileTabLayout"
         android:layout_width="match_parent"
@@ -90,7 +100,6 @@
         app:tabIndicator="@drawable/bg_tab_active"
         app:tabMode="fixed" />
 
-    <!-- Окно для контента (списков), которое будет меняться -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/profileViewPager"
         android:layout_width="match_parent"

@@ -124,9 +124,22 @@
             android:id="@+id/btn_like"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_liked"
+            app:layout_constraintBottom_toBottomOf="@id/img_current_track"
+            app:layout_constraintEnd_toStartOf="@id/btn_prev"
+            app:layout_constraintTop_toTopOf="@id/img_current_track"
+            app:tint="#FFFFFF" />
+
+        <!-- Кнопка НАЗАД -->
+        <ImageButton
+            android:id="@+id/btn_prev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_media_previous"
             app:layout_constraintBottom_toBottomOf="@id/img_current_track"
             app:layout_constraintEnd_toStartOf="@id/btn_play_pause"
             app:layout_constraintTop_toTopOf="@id/img_current_track"
@@ -137,9 +150,22 @@
             android:id="@+id/btn_play_pause"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_media_play"
+            app:layout_constraintBottom_toBottomOf="@id/img_current_track"
+            app:layout_constraintEnd_toStartOf="@id/btn_next"
+            app:layout_constraintTop_toTopOf="@id/img_current_track"
+            app:tint="#FFFFFF" />
+
+        <!-- Кнопка ВПЕРЕД -->
+        <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_media_next"
             app:layout_constraintBottom_toBottomOf="@id/img_current_track"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/img_current_track"

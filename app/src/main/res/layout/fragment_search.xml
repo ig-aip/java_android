@@ -29,19 +29,34 @@
         android:paddingHorizontal="16dp"
         android:textColor="#FFFFFF"
         android:textColorHint="#80FFFFFF"
+        android:inputType="text"
+        android:maxLines="1"
+        android:imeOptions="actionSearch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_search_header" />
+
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#000000"
+        app:tabTextColor="#A0A0A0"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabIndicatorColor="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/et_search"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_search_results"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_search" />
+        app:layout_constraintTop_toBottomOf="@id/tabLayoutSearch" />
 
     <!-- Placeholder text shown when empty -->
     <TextView
@@ -53,6 +68,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/et_search" />
+        app:layout_constraintTop_toBottomOf="@id/tabLayoutSearch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
